@@ -27,4 +27,11 @@ autogpt_platform/frontend/scripts/check-token-equivalence.ts @Significant-Gravit
 autogpt_platform/frontend/scripts/screenshot-pages.ts @Significant-Gravitas/frontend-maintainers @Significant-Gravitas/design
 docs/engineering/design-system.md @Significant-Gravitas/frontend-maintainers @Significant-Gravitas/design
 
+# Mobile app (SECRT-3784): the mobile owners approve every change to the app.
+# See the Notion page "Mobile App" > "Owners and access".
+autogpt_platform/mobile-app/ @Significant-Gravitas/mobile-maintainers
+.easignore @Significant-Gravitas/mobile-maintainers
+docs/engineering/native-mobile/ @Significant-Gravitas/mobile-maintainers
+autogpt_platform/backend/test/native_mobile/ @Significant-Gravitas/mobile-maintainers
+
 .github/CODEOWNERS @Significant-Gravitas/admins
