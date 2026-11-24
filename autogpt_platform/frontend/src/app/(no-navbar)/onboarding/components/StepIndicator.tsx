@@ -12,7 +12,7 @@ export function StepIndicator({ totalSteps, currentStep }: Props) {
         <div
           key={i}
           className={cn(
-            "h-1.5 rounded-full transition-all",
+            "h-1.5 rounded-pill transition-all",
             i + 1 === currentStep
               ? "w-4 bg-action-hover"
               : "w-1.5 bg-surface-active",
