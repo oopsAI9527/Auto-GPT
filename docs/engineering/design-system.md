@@ -42,7 +42,22 @@ The app has one colour system: the role tokens. Their values live in one place, 
 - Status: `error`, `error-hover`, `error-foreground`, `error-surface`, `warning`, `warning-foreground`, `warning-surface`, `warning-border`, `success`, `success-foreground`, `success-surface`, `info`, `info-foreground`, `info-surface`, and `error-inverse` and `success-inverse` for status text on the always-dark toast, terminal and tooltip
 - Accents, hues that are not a status (categories, usage meters, data types, badges): `orange`, `orange-foreground`, `yellow`, `yellow-foreground`, `sky`, `sky-foreground`, `indigo`, `pink`, `pink-foreground`. A pale tint or border of a hue is the hue at an opacity: `bg-orange/10`, `bg-pink/10`, `ring-sky/30`.
 - Builder: `builder-canvas`, `builder-grid`, `node-surface`, `node-border`, `node-selected`, `edge`, `handle`
-- Not used yet: `surface-inverse`, `surface-inverse-hover`, `foreground-inverse` (a dark fill and the text on it), `fill-subtle`, `fill-strong` (solid marks that are not text), and `shell`, `shell-foreground`, `shell-hover`, `shell-active`, `shell-border` (the app frame around the page)
+- Inverse: `surface-inverse`, `surface-inverse-hover` (a dark surface that shows content on the light theme: a toast, a tooltip, a terminal or code block, the user's chat bubble, a dark chip or badge) and `foreground-inverse`, the text and icons on it (`tone="inverse"`)
+- On colour: `foreground-on-color`, text and icons on a saturated fill (`bg-brand`, a status, `bg-accent-strong`, an accent), `tone="on-color"`
+- Fills, solid marks that are not text (dots, bars, tracks, icon tiles, an illustration's marks), lightest first: `fill-subtle`, `fill-soft`, `fill-medium`, `fill-bold`, `fill-strong`
+- Not used yet: `shell`, `shell-foreground`, `shell-hover`, `shell-active`, `shell-border` (the app frame around the page)
+
+#### What a role means
+
+A role is named for what it colours, and a look changes it for that job alone: a look that makes the primary Button purple changes `action`, and nothing else may turn purple with it. So pick the role by meaning, not by the colour it happens to have today:
+
+- `action` and `action-hover` are the primary Button and controls that act like one (the send button, a pressed or selected choice), and the markers of what is selected, current or in progress: a checked box, the selected tab's indicator, the current step, a progress or usage bar, a loader. `action-foreground` is the text and icons on them. An Icon inside a primary Button takes no tone; it inherits the Button's colour.
+- A dark surface that shows content is not an action, even when it is the same colour: it is `surface-inverse` (or `-hover`) with `foreground-inverse` on it.
+- White on a coloured fill is `foreground-on-color`, not `action-foreground`.
+- A text role (`foreground-*`) colours text and icons. A dot, bar, track, divider, tile or skeleton block is a fill (`fill-*`), a backdrop is `scrim`, and a line is `separator` or a `border-*` role.
+- A surface role (`canvas`, `surface-*`) is never a text colour.
+
+- **Rule `design-system/no-misused-role`:** a fill (`bg-`, `from-`, `via-`, `to-`) on a text role (`bg-foreground-subtle`), and text (`text-`) on a surface role (`text-surface-muted`). The error names the fill role with the same colour when there is one. A gradient clipped to its text (`bg-clip-text`) is that text's colour, so its stops may read text roles. Lint can't tell an action from a dark surface, since both are fills of roles that share a colour today; reviewers check that `bg-action` is an action and `bg-surface-inverse` is not. The baseline holds only the Button atom (a disabled fill and disabled text), which is being reworked separately.
 
 `src/components/styles/color-roles.ts` lists every role (the Tokens/Colors story draws it). To add one, write its triplet in `theme.css`, register it in `globals.css`'s `@theme` and list it there; add one only when real, repeated uses need a colour no role has.
 
@@ -148,14 +163,14 @@ Two attributes on `<html>` set how the app looks. They are independent.
 - **`data-theme`** is the mode: `light` or `dark`, and nothing else. next-themes writes it from `src/app/providers.tsx`, which forces `light`. The attribute is kept for the mode because the components we vendor switch their own dark styles on `[data-theme="dark"]`. `globals.css` ties `dark:` to the same selector (`@custom-variant dark`), and `shape.css` keeps its one dark value, `--smooth-ring-color`, under it. Neither renders today.
 - **`data-look`** is the look: a set of brand colour and shape values. The canary look, a dev tool, is the one example (see "The canary look").
 
-`src/components/__tests__/theme-contrast.test.ts` computes WCAG contrast from the light triplets: the body text roles on `canvas`, `surface` and `surface-muted`, `action-foreground` on `action`, the inverse text on `surface-inverse`, `accent-strong` on `accent-surface`, each status foreground on its surface (4.5:1) and `placeholder` on `surface` (3:1). The pairs that fail today are listed in the test with their ratio.
+`src/components/__tests__/theme-contrast.test.ts` computes WCAG contrast from the light triplets: the body text roles on `canvas`, `surface` and `surface-muted`, `action-foreground` on `action`, the inverse text on `surface-inverse`, `foreground-on-color` on `brand`, `error`, `success`, `info` and `accent-strong`, `accent-strong` on `accent-surface`, each status foreground on its surface (4.5:1) and `placeholder` on `surface` (3:1). The pairs that fail today are listed in the test with their ratio.
 
 ### Adding a theme later
 
 1. Write a file under `src/app/tokens/themes/` that redefines every colour role under `html[data-theme="dark"]`, and import it from `globals.css` right after `theme.css`.
 2. Add it to the `THEMES` list in `theme-contrast.test.ts`, and add a test that it redefines every colour role, like `canary-look.test.ts` does for the canary.
 3. Stop forcing light in `providers.tsx`.
-4. In that file, give the inverse and fill roles values of their own. In `theme.css` they repeat the values of `action` and of text roles.
+4. In that file, give the inverse, fill and on-colour roles values of their own. In `theme.css` they repeat the values of `action`, `action-foreground` and of text roles.
 
 ## Primitives
 

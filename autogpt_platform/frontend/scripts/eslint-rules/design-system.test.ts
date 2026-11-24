@@ -295,6 +295,59 @@ tester.run("no-arbitrary-colour", rule("no-arbitrary-colour"), {
   ],
 });
 
+tester.run("no-misused-role", rule("no-misused-role"), {
+  valid: [
+    jsx(
+      "bg-fill-subtle bg-scrim/20 text-foreground-inverse bg-surface-inverse text-foreground-on-color border-foreground-subtle ring-foreground-subtle/40",
+    ),
+    // A gradient clipped to its text is that text's colour.
+    jsx(
+      "bg-gradient-to-r from-foreground-subtle via-foreground-secondary to-foreground-subtle bg-clip-text text-transparent",
+    ),
+    // Other words that start the same.
+    jsx("text-surface-ish bg-foreground-ish"),
+    {
+      code: `// oxlint-disable-next-line design-system/no-misused-role -- waits for a design call\nconst a = "text-surface-muted";`,
+      filename: FILE,
+    },
+  ],
+  invalid: [
+    {
+      ...jsx(
+        "bg-foreground-subtle hover:bg-foreground-base/20 from-foreground-tertiary to-foreground-emphasis",
+      ),
+      errors: [
+        {
+          message:
+            /^"bg-foreground-subtle" paints a fill with a text role.*Use "bg-fill-subtle", the fill role with the same colour/,
+        },
+        {
+          message:
+            /^"hover:bg-foreground-base\/20" .*Use "bg-fill-strong".*A backdrop is "scrim"/,
+        },
+        { message: /^"from-foreground-tertiary" .*Use "from-fill-soft"/ },
+        { message: /^"to-foreground-emphasis" .*Use a fill role/ },
+      ],
+    },
+    {
+      // Clipping to text excuses the gradient stops, not a plain fill.
+      ...jsx("bg-foreground-body bg-clip-text"),
+      errors: [{ message: /^"bg-foreground-body" .*Use "bg-fill-bold"/ }],
+    },
+    {
+      code: 'const tip = cn("text-surface-muted", isOff && "disabled:text-canvas");',
+      filename: FILE,
+      errors: [
+        {
+          message:
+            /^"text-surface-muted" colours text with a surface role.*"foreground-inverse" on the inverse surface/,
+        },
+        { message: /^"disabled:text-canvas" colours text with a surface role/ },
+      ],
+    },
+  ],
+});
+
 tester.run("no-raw-z-index", rule("no-raw-z-index"), {
   valid: [
     jsx("relative z-raised hover:z-overlay focus-visible:z-sticky z-auto"),

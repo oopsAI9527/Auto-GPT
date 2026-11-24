@@ -19,6 +19,7 @@ const BODY_TEXT = [
   "foreground-tertiary",
 ];
 const PAGE = ["canvas", "surface", "surface-muted"];
+const SATURATED = ["brand", "error", "success", "info", "accent-strong"];
 
 const PAIRS: [text: string, background: string, minimum: number][] = [
   ...BODY_TEXT.flatMap((text) =>
@@ -34,6 +35,9 @@ const PAIRS: [text: string, background: string, minimum: number][] = [
   ["success-foreground", "success-surface", TEXT],
   ["info-foreground", "info-surface", TEXT],
   ["placeholder", "surface", PLACEHOLDER],
+  ...SATURATED.map(
+    (fill) => ["foreground-on-color", fill, TEXT] as [string, string, number],
+  ),
 ];
 
 // Pairs the light theme fails today, with the ratio measured. They are left
@@ -44,6 +48,9 @@ const LIGHT_BELOW_MINIMUM: Record<string, string> = {
   "foreground-tertiary on surface": "3.72",
   "foreground-tertiary on surface-muted": "3.57",
   "error-inverse on surface-inverse": "3.54",
+  "foreground-on-color on error": "3.73",
+  "foreground-on-color on success": "3.89",
+  "foreground-on-color on info": "3.65",
 };
 
 function palette(tokens: Map<string, string>) {
